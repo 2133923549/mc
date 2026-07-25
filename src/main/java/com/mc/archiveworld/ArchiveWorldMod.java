@@ -2,7 +2,6 @@ package com.mc.archiveworld;
 
 import com.mc.archiveworld.item.ModItems;
 import com.mc.archiveworld.world.ArchiveWorldManager;
-import com.mc.archiveworld.world.ArchiveWorldRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,12 +23,9 @@ public class ArchiveWorldMod {
 
     public ArchiveWorldMod(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
-
         ModItems.ITEMS.register(modEventBus);
-
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
-
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -45,14 +41,7 @@ public class ArchiveWorldMod {
 
     @SubscribeEvent
     public void onServerStarted(final ServerStartedEvent event) {
-        var registry = new ArchiveWorldRegistry();
-        registry.initialize();
-        ArchiveWorldManager.setRegistry(registry);
-
-        var defaultWorld = registry.getDefaultWorld();
-        if (defaultWorld != null) {
-            LOGGER.info("Default Archive World: {} ({})", defaultWorld.getName(), defaultWorld.getId());
-        }
+        ArchiveWorldManager.loadSharedArchiveWorld(event.getServer());
     }
 
     @SubscribeEvent
