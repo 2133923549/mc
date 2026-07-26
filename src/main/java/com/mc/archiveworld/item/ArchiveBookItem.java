@@ -1,9 +1,10 @@
 package com.mc.archiveworld.item;
 
-import com.mc.archiveworld.world.ArchiveMeta;
 import com.mc.archiveworld.world.ArchiveWorldManager;
-import com.mc.archiveworld.world.ArchiveWorldStorage;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -12,9 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ArchiveBookItem extends Item {
 
@@ -34,7 +32,7 @@ public class ArchiveBookItem extends Item {
 
         if (player instanceof ServerPlayer serverPlayer) {
             if (player.isShiftKeyDown()) {
-                showInfo(serverPlayer);
+                showMenu(serverPlayer);
             } else {
                 ArchiveWorldManager.enterArchiveWorld(serverPlayer);
             }
@@ -43,22 +41,20 @@ public class ArchiveBookItem extends Item {
         return InteractionResultHolder.success(itemStack);
     }
 
-    private static void showInfo(ServerPlayer player) {
-        if (!ArchiveWorldStorage.exists()) {
-            player.sendSystemMessage(Component.literal("Archive World unavailable."));
-            return;
-        }
-        var meta = ArchiveMeta.loadOrCreate();
-        var fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        player.sendSystemMessage(Component.literal(
-                "[Archive World]"));
-        player.sendSystemMessage(Component.literal(
-                "  Name: " + meta.worldName));
-        player.sendSystemMessage(Component.literal(
-                "  Generator: " + meta.generatorType));
-        player.sendSystemMessage(Component.literal(
-                "  Created: " + fmt.format(new Date(meta.createdAt))));
-        player.sendSystemMessage(Component.literal(
-                "  Last Access: " + fmt.format(new Date(meta.lastAccessedAt))));
+    private static void showMenu(ServerPlayer player) {
+        player.sendSystemMessage(Component.literal("━━ Archive World ━━").withStyle(ChatFormatting.GOLD));
+        player.sendSystemMessage(btn("/archiveworld enter", "[Enter World]", ChatFormatting.GREEN, "Click to enter"));
+        player.sendSystemMessage(btn("/archiveworld info", "[Show Info]", ChatFormatting.AQUA, "Click for details"));
+        player.sendSystemMessage(btn("/archiveworld mark", "[Mark Here]", ChatFormatting.YELLOW, "Click to save position"));
+        player.sendSystemMessage(btn("/archiveworld markers", "[Markers]", ChatFormatting.LIGHT_PURPLE, "View saved markers"));
+        player.sendSystemMessage(btn("/archiveworld backup", "[Backup]", ChatFormatting.BLUE, "Backup archive world"));
+        player.sendSystemMessage(btn("/archiveworld reset", "[Reset Position]", ChatFormatting.RED, "Click to reset position"));
+    }
+
+    private static Component btn(String cmd, String label, ChatFormatting color, String hover) {
+        return Component.literal(" " + label)
+                .withStyle(color)
+                .withStyle(s -> s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(hover))));
     }
 }

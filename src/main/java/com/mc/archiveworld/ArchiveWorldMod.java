@@ -6,6 +6,8 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import com.mc.archiveworld.world.ArchiveCommand;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -47,5 +49,10 @@ public class ArchiveWorldMod {
     @SubscribeEvent
     public void onServerStopping(final ServerStoppingEvent event) {
         ArchiveWorldManager.onServerStopping();
+    }
+
+    @SubscribeEvent
+    public void onRegisterCommands(final RegisterCommandsEvent event) {
+        ArchiveCommand.register(event.getDispatcher());
     }
 }

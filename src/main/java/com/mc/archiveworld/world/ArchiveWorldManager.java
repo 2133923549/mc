@@ -47,6 +47,10 @@ public class ArchiveWorldManager {
         LOGGER.info("[ArchiveWorld] Server stopping, cleared all positions");
     }
 
+    public static void resetPosition(UUID playerId) {
+        lastArchivePositions.remove(playerId);
+    }
+
     public static ServerLevel loadSharedArchiveWorld(MinecraftServer server) {
         try {
             var existing = server.getLevel(ARCHIVE_KEY);
